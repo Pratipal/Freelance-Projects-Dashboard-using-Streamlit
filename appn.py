@@ -11,6 +11,8 @@ PRIMARY_CHART_COLOR = ['#ff7300']
 
 #Test Comment
 
+# Testing one more command
+
 # Reading the Data and dropping duplicates
 df = pd.read_csv('Freelance Platform Projects.csv')
 df = df.drop_duplicates()
