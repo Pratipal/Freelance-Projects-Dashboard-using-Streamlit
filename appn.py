@@ -11,7 +11,7 @@ PRIMARY_CHART_COLOR = ['#ff7300']
 
 
 # Reading the Data and dropping duplicates
-df = pd.read_csv('../Data/Freelance Platform Projects.csv')
+df = pd.read_csv('Freelance Platform Projects.csv')
 df = df.drop_duplicates()
 
 # Reading the geojson file downloaded from https://datahub.io/core/geo-countries/r/countries.geojson and renaming some of the columns
