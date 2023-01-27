@@ -9,10 +9,6 @@ c = CurrencyRates()
 # Primary color for charts
 PRIMARY_CHART_COLOR = ['#ff7300']
 
-#Test Comment
-
-# Testing one more command
-
 # Reading the Data and dropping duplicates
 df = pd.read_csv('Freelance Platform Projects.csv')
 df = df.drop_duplicates()
@@ -35,6 +31,7 @@ country_dict['Viet Nam']                  = 'VNM'
 country_dict['Serbia']                    = 'SRB'
 country_dict['Taiwan, Province of China'] = 'TWN'
 country_dict['Moldova, Republic of']      = 'MDA'
+country_dict['North Macedonia']           = 'MKD'
 
 
 # Adding some new columns to the dataframe as well and converting types of the columns accordingly
@@ -63,6 +60,25 @@ sl.set_page_config(page_title='Freelance Projects Dashboard',
 # Getting the min and max date for date filter
 min_date = df['Date Posted'].min()
 max_date = df['Date Posted'].max()
+
+# Introduction
+
+intro_text = '''Welcome to the Freelance Projects Dashboard. 
+
+I started collecting freelance projects data from PeoplePerHour on 20th January 2023 using Python and GitHub Actions.
+
+Data contains attributes such as title of the project, category of the project, client budget, client country, date posted, client registration date, etc.
+
+Data is available on Kaggle and it is updated every hour.
+
+More information can be found [here](https://www.kaggle.com/datasets/prtpljdj/freeelance-platform-projects).
+
+Note: I will add more charts and info,  once enough data is available.
+
+'''
+
+sl.sidebar.header('Introduction:')
+sl.sidebar.write(intro_text)
 
 # Creating a sidebar with a header
 sl.sidebar.header("Filters")
@@ -158,6 +174,8 @@ hide_table_row_index = """
 # Creating 6 new columns to show the KPIs
 first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
 
+first_column.markdown('##')
+first_column.markdown('##')
 first_column.subheader("Total Projects:")
 second_column.subheader("Top 3 Categories by Project Count:")
 third_column.subheader("Top 3 Sub Categories by Project Count:")
@@ -189,21 +207,33 @@ sl.markdown('---')
 # left_column, right_column = sl.columns(2, gap = 'large')
 
 
-# Grouping by day name
-day_df = df.groupby(['Day', 'Category Name']).size().reset_index(name = 'Count')
-
-# Creating a plotly bar chart
-# fig_by_day = px.bar(day_df,
-#                     x = 'Day', 
-#                     y = 'Count', 
-#                     color_discrete_sequence = PRIMARY_CHART_COLOR
-#                     )
+# Lets check the number of projects by week day
+day_df = df.groupby(['Day']).size().reset_index(name = 'Count')
 
 with chart_container(day_df):
     # Setting header and adding some notes
-    sl.header('Total Projects By Week Day')
+    sl.header('Breaking down the number of projects by week day.')
     sl.text('(Independent of Date Selection as there is not much data at the moment.)')
     fig_by_day = px.bar(day_df,
+                        x = 'Day', 
+                        y = 'Count',
+                        color_discrete_sequence = PRIMARY_CHART_COLOR
+                        )
+
+    # Displaying the chart on left_column
+    sl.plotly_chart(fig_by_day, use_container_width=True)
+
+sl.text('Thursday seems to be the busiest day but we dont have enough data to come to a conclusion yet.')
+
+
+# Grouping by day name
+day_cat_df = df.groupby(['Day', 'Category Name']).size().reset_index(name = 'Count')
+
+with chart_container(day_cat_df):
+    # Setting header and adding some notes
+    sl.header('Further breaking down the number of projects by week day and category.')
+    sl.text('(Independent of Date Selection as there is not much data at the moment.)')
+    fig_by_day_cat = px.bar(day_cat_df,
                         x = 'Day', 
                         y = 'Count',
                         color='Category Name',
@@ -211,14 +241,15 @@ with chart_container(day_df):
                         )
 
     # Displaying the chart on left_column
-    sl.plotly_chart(fig_by_day, use_container_width=True)
+    sl.plotly_chart(fig_by_day_cat, use_container_width=True)
+
 
 # Grouping by hour of the day
 hour_df = df.groupby(['Hour', 'Category Name']).size().reset_index(name = 'Count')
 
 with chart_container(hour_df):
     # Setting header and adding some notes
-    sl.header('Total Projects By Hour of the Day')
+    sl.header('Number of projects by hour of the day and category')
     sl.text('(Independent of Date Selection as there is not much data at the moment.)')
 
     # Creating a plotly bar chart
@@ -251,6 +282,7 @@ left_column.plotly_chart(fig_by_category)
 
 
 right_column.header('Average Project Budget by Category')
+right_column.write('Note: Hourly projets are excluded.')
 
 avg_budget_df = df_selection[df_selection['Type']=='fixed_price'].groupby('Category Name').mean()
 
@@ -261,7 +293,6 @@ avg_budget_chart = px.bar(avg_budget_df,
                           )
 
 right_column.plotly_chart(avg_budget_chart)
-right_column.write('Note: Hourly projets are excluded from the Averge Bugdet Chart!')
 
 # -----------------------
 
@@ -294,7 +325,7 @@ pie_by_sub_category = df_selection[df_selection['Category Name']==pie_category].
 
 pie_t = px.pie(pie_by_sub_category, values = 'Count', names = 'Sub Category Name')
 
-middle.header('Sub category Pie Chart')
+middle.header('Percentage of Sub categories.')
 middle.plotly_chart(pie_t, use_container_width=True)
 
 
@@ -302,7 +333,7 @@ experience_df = df_selection.groupby('Experience').size().reset_index(name = 'Co
 
 with chart_container(experience_df):
     
-    sl.header('Projects by Required Experience')
+    sl.header('Percentage of projects by required expertise.')
     pie_e = px.pie(experience_df, values = 'Count', names = 'Experience')
 
     sl.plotly_chart(pie_e, use_container_width=True)
@@ -324,7 +355,7 @@ country_df = df_selection.groupby(['Client Country', 'iso_alpha']).size().reset_
 
 with chart_container(country_df):
     # left, middle, right = sl.columns((2, 5, 2))
-    sl.header('Projects by Client Country :earth_asia:')
+    sl.header('Number of projects by client country.')
     fig_country = px.choropleth(country_df,
                         locations = 'iso_alpha', 
                         hover_data = ['Client Country', 'Count'], 
