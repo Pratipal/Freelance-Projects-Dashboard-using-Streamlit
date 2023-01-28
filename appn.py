@@ -92,6 +92,8 @@ Data is available on Kaggle and it is updated every hour.
 
 More information can be found [here](https://www.kaggle.com/datasets/prtpljdj/freeelance-platform-projects).
 
+Github: [Link](https://github.com/Pratipal/Freelance-Projects-Dashboard-using-Streamlit)
+
 Note: I will add more charts and info,  once enough data is available.
 
 '''
