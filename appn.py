@@ -3,14 +3,27 @@ import pandas as pd
 import streamlit as sl
 from streamlit_extras.chart_container import chart_container
 import plotly.express as px
+from kaggle.api.kaggle_api_extended import KaggleApi
 from forex_python.converter import CurrencyRates
+
+
+def get_projects(api):
+    api.dataset_download_files("prtpljdj/freeelance-platform-projects", unzip=True)
+    df = pd.read_csv("Freelance Platform Projects.csv")
+    return df
+
+api = KaggleApi()
+api.authenticate()
+
 c = CurrencyRates()
 
 # Primary color for charts
 PRIMARY_CHART_COLOR = ['#ff7300']
 
 # Reading the Data and dropping duplicates
-df = pd.read_csv('Freelance Platform Projects.csv')
+# df = pd.read_csv('Freelance Platform Projects.csv')
+
+df = get_projects(api)
 df = df.drop_duplicates()
 
 # Reading the geojson file downloaded from https://datahub.io/core/geo-countries/r/countries.geojson and renaming some of the columns
@@ -25,6 +38,7 @@ for i in range(0, 254):
     country_dict[country_dict_raw[i]['country']] = country_dict_raw[i]['iso_alpha']
 
 # Adding a few values to the dict
+
 country_dict['United States']             = 'USA'
 country_dict['Russian Federation']        = 'RUS'
 country_dict['Viet Nam']                  = 'VNM'
@@ -36,7 +50,7 @@ country_dict['Hong Kong']                 = 'HKG'
 
 
 # Adding some new columns to the dataframe as well and converting types of the columns accordingly
-df['iso_alpha'] = df['Client Country'].apply(lambda x: country_dict[x])
+df['iso_alpha'] = df['Client Country'].apply(lambda x: country_dict[x] if x in country_dict.keys() else '')
 df['Experience'] = df['Experience'].str.split('(', 1, expand = True)[0]
 
 df['Date Posted'] = pd.to_datetime(df['Date Posted'])
