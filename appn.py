@@ -101,13 +101,6 @@ except ValueError:
     sl.error("You must pick a start and end date")
     sl.stop() # this makes sure that they pick a date before moving on
 
-
-# # Adding a selectbox filter for the piechart
-# pie_category = sl.sidebar.selectbox(
-#                 "Select Categroy for Sub Category Pie Chart",
-#                 options = df['Category Name'].unique())
-
-
 # Extracting the date from the Date Posted colunmn
 df['Date'] = df['Date Posted'].dt.date
 
@@ -199,43 +192,8 @@ sl.table(xdf)
 
 sl.write('Note: Hourly projects are excluded for the Hightest and Lowest budget.')
 
-# # Creating 6 new columns to show the KPIs
-# first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
-
-# first_column.markdown('##')
-# first_column.markdown('##')
-# first_column.subheader("Total Projects:")
-# second_column.subheader("Top 3 Categories by Project Count:")
-# third_column.subheader("Top 3 Sub Categories by Project Count:")
-# fourth_column.subheader("Top 3 Client Countries by Project Count:")
-# fifth_column.subheader("Project with Highest Budget:")
-# sixth_column.subheader("Project with Lowest Budget:")
-
-# sl.markdown('---')
-
-# first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
-
-# first_column.subheader(f"={project_count}")
-# second_column.write(f'{top_3_categories}')
-# third_column.write(f"{top_3_sub_categories}")
-# fourth_column.write(f"{top_3_client_countries}")
-
-# fifth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
-# fifth_column.table(mep_df)
-# fifth_column.write('Note: Hourly projets are excluded!')
-
-# sixth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
-# sixth_column.table(lep_df)
-# sixth_column.write('Note: Hourly projets are excluded!')
-
-# Separating the charts by line
 sl.markdown('---')
 
-# Creating left and right column to show charts
-# left_column, right_column = sl.columns(2, gap = 'large')
-
-
-# Lets check the number of projects by week day
 day_df = df.groupby(['Day']).size().reset_index(name = 'Count')
 
 with chart_container(day_df):
@@ -251,7 +209,7 @@ with chart_container(day_df):
     # Displaying the chart on left_column
     sl.plotly_chart(fig_by_day, use_container_width=True)
 
-sl.text('Thursday seems to be the busiest day but we dont have enough data to come to a conclusion yet.')
+# sl.text('Don\'t have enough data to come to a conclusion yet.')
 
 
 # Grouping by day name
@@ -322,19 +280,6 @@ avg_budget_chart = px.bar(avg_budget_df,
 
 right_column.plotly_chart(avg_budget_chart)
 
-# -----------------------
-
-# pie_by_sub_category = df_selection[df_selection['Category Name']==pie_category].groupby('Sub Category Name').size().reset_index(name = 'Count')
-
-# pie_t = px.pie(pie_by_sub_category, values = 'Count', names = 'Sub Category Name')
-
-# right_column.header('Sub category Pie Chart')
-# right_column.plotly_chart(pie_t)
-
-# -----------------------
-
-
-
 sl.markdown('---')
 left, middle, right = sl.columns((2, 5, 2))
 
@@ -365,19 +310,6 @@ with chart_container(experience_df):
     pie_e = px.pie(experience_df, values = 'Count', names = 'Experience')
 
     sl.plotly_chart(pie_e, use_container_width=True)
-
-# right_column.header('Average Project Budget by Category')
-
-# avg_budget_df = df_selection[df_selection['Type']=='fixed_price'].groupby('Category Name').mean()
-
-# avg_budget_chart = px.bar(avg_budget_df, 
-#                           x = avg_budget_df.index,
-#                           y = 'Budget_USD', 
-#                           color_discrete_sequence = PRIMARY_CHART_COLOR
-#                           )
-
-# right_column.plotly_chart(avg_budget_chart)
-# right_column.write('Note: Hourly projets are excluded!')
 
 country_df = df_selection.groupby(['Client Country', 'iso_alpha']).size().reset_index(name = 'Count')
 
