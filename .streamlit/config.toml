@@ -1,3 +1,14 @@
 [theme]
 base="dark"
 primaryColor="purple"
+
+# Background color for the main content area
+backgroundColor = 'black'
+
+# Color used for almost all te
+
+secondaryTextColor = '#000000'
+
+secondaryBackgroundColor = "darkorange"
+
+font = "sans serif"

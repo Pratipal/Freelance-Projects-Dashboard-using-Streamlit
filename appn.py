@@ -136,9 +136,15 @@ emojis = ['', ':first_place_medal:', ':second_place_medal:', ':third_place_medal
 
 
 # Extracting the values of KPI's
-top_3_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' + x[1] for x in enumerate(df_selection['Category Name'].value_counts().index[0:3], start = 1)])
-top_3_sub_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Sub Category Name'].value_counts().index[0:3], start = 1)])
-top_3_client_countries = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Client Country'].value_counts().index[0:3], start = 1)])
+top_3_categories = df_selection['Category Name'].value_counts().index[0:3]
+top_3_sub_categories = df_selection['Sub Category Name'].value_counts().index[0:3]
+top_3_client_countries = df_selection['Client Country'].value_counts().index[0:3]
+
+
+# # Extracting the values of KPI's
+# top_3_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' + x[1] for x in enumerate(df_selection['Category Name'].value_counts().index[0:3], start = 1)])
+# top_3_sub_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Sub Category Name'].value_counts().index[0:3], start = 1)])
+# top_3_client_countries = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Client Country'].value_counts().index[0:3], start = 1)])
 
 
 # Sorting the filtered dataframe by Budget in descending order
@@ -147,6 +153,10 @@ sorted_df = df_selection.sort_values(['Budget_USD'], ascending=False)
 most_expensive_budget = round(sorted_df[sorted_df['Type']=='fixed_price']['Budget_USD'].values[0], 2)
 most_expensive_category = sorted_df[sorted_df['Type']=='fixed_price']['Category Name'].values[0]
 most_expensive_subcategory = sorted_df[sorted_df['Type']=='fixed_price']['Sub Category Name'].values[0]
+
+mep_data = [f'Budget - ${most_expensive_budget:,}',
+            f'Category - {most_expensive_category}',
+            f'Sub Category - {most_expensive_subcategory}']
 
 # Creating a dataframt to display the info in a table
 mep_df = pd.DataFrame([['Budget', 'Category', 'Sub Category'],
@@ -158,6 +168,10 @@ least_expensive_category = sorted_df[sorted_df['Type']=='fixed_price']['Category
 least_expensive_subcategory = sorted_df[sorted_df['Type']=='fixed_price']['Sub Category Name'].values[-1]
 
 
+lep_data = [f'Budget - ${least_expensive_budget:,}',
+            f'Category - {least_expensive_category}',
+            f'Sub Category - {least_expensive_subcategory}']
+
 # Creating a dataframt to display the info in a table
 lep_df = pd.DataFrame([['Budget', 'Category', 'Sub Category'],
                         [f'${least_expensive_budget:,}', least_expensive_category, least_expensive_subcategory]]).T
@@ -167,38 +181,49 @@ hide_table_row_index = """
             <style>
             thead tr th:first-child {display:none}
             tbody th {display:none}
-            thead th {display:none}
+            # thead th {display:none}
             </style>
             """
 
-# Creating 6 new columns to show the KPIs
-first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
 
-first_column.markdown('##')
-first_column.markdown('##')
-first_column.subheader("Total Projects:")
-second_column.subheader("Top 3 Categories by Project Count:")
-third_column.subheader("Top 3 Sub Categories by Project Count:")
-fourth_column.subheader("Top 3 Client Countries by Project Count:")
-fifth_column.subheader("Project with Highest Budget:")
-sixth_column.subheader("Project with Lowest Budget:")
+cols = ["Total Projects", "Top 3 Categories by Project Count:", "Top 3 Sub Categories by Project Count:", "Top 3 Client Countries by Project Count:", "Project with Highest Budget:", "Project with Lowest Budget:"]
+data = [[project_count], top_3_categories, top_3_sub_categories, top_3_client_countries, mep_data, lep_data]
 
-sl.markdown('---')
+xdf = pd.DataFrame(data).T.fillna('')
+xdf.columns = cols
 
-first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
+# sl.dataframe(xdf)
+sl.markdown(hide_table_row_index, unsafe_allow_html=True)
+sl.table(xdf)
 
-first_column.subheader(f"={project_count}")
-second_column.write(f'{top_3_categories}')
-third_column.write(f"{top_3_sub_categories}")
-fourth_column.write(f"{top_3_client_countries}")
+# # Creating 6 new columns to show the KPIs
+# first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
 
-fifth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
-fifth_column.table(mep_df)
-fifth_column.write('Note: Hourly projets are excluded!')
+# first_column.markdown('##')
+# first_column.markdown('##')
+# first_column.subheader("Total Projects:")
+# second_column.subheader("Top 3 Categories by Project Count:")
+# third_column.subheader("Top 3 Sub Categories by Project Count:")
+# fourth_column.subheader("Top 3 Client Countries by Project Count:")
+# fifth_column.subheader("Project with Highest Budget:")
+# sixth_column.subheader("Project with Lowest Budget:")
 
-sixth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
-sixth_column.table(lep_df)
-sixth_column.write('Note: Hourly projets are excluded!')
+# sl.markdown('---')
+
+# first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
+
+# first_column.subheader(f"={project_count}")
+# second_column.write(f'{top_3_categories}')
+# third_column.write(f"{top_3_sub_categories}")
+# fourth_column.write(f"{top_3_client_countries}")
+
+# fifth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
+# fifth_column.table(mep_df)
+# fifth_column.write('Note: Hourly projets are excluded!')
+
+# sixth_column.markdown(hide_table_row_index, unsafe_allow_html=True)
+# sixth_column.table(lep_df)
+# sixth_column.write('Note: Hourly projets are excluded!')
 
 # Separating the charts by line
 sl.markdown('---')
