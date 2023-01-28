@@ -13,16 +13,8 @@ def get_projects(api):
     df = pd.read_csv("Freelance Platform Projects.csv")
     return df
 
-# un = sl.secrets["KAGGLE_USERNAME"]
-# key = sl.secrets["KAGGLE_KEY"]
-
-# un = sl.secrets["KAGGLE_USERNAME"]
-# key = sl.secrets["KAGGLE_KEY"]
-
-# api_token = {"username":"USERNAME","key":"API_KEY"}
-
-os.environ['KAGGLE_USERNAME'] = sl.secrets["KAGGLE_USERNAME"]
-os.environ['KAGGLE_KEY']      = sl.secrets["KAGGLE_KEY"]
+os.environ["KAGGLE_USERNAME"] = sl.secrets["KAGGLE_USERNAME"]
+os.environ["KAGGLE_KEY"] = sl.secrets["KAGGLE_KEY"]
 
 api = KaggleApi()
 api.authenticate()
