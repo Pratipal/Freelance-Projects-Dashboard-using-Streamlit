@@ -12,8 +12,11 @@ def get_projects(api):
     df = pd.read_csv("Freelance Platform Projects.csv")
     return df
 
+un = sl.secrets["KAGGLE_USERNAME"]
+key = sl.secrets["KAGGLE_KEY"]
+
 api = KaggleApi()
-api.authenticate()
+api.authenticate(un, key)
 
 c = CurrencyRates()
 
