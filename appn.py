@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as sl
 from streamlit_extras.chart_container import chart_container
 import plotly.express as px
+import os
 from kaggle.api.kaggle_api_extended import KaggleApi
 from forex_python.converter import CurrencyRates
 
@@ -12,11 +13,19 @@ def get_projects(api):
     df = pd.read_csv("Freelance Platform Projects.csv")
     return df
 
-un = sl.secrets["KAGGLE_USERNAME"]
-key = sl.secrets["KAGGLE_KEY"]
+# un = sl.secrets["KAGGLE_USERNAME"]
+# key = sl.secrets["KAGGLE_KEY"]
+
+# un = sl.secrets["KAGGLE_USERNAME"]
+# key = sl.secrets["KAGGLE_KEY"]
+
+# api_token = {"username":"USERNAME","key":"API_KEY"}
+
+os.environ['KAGGLE_USERNAME'] = sl.secrets["KAGGLE_USERNAME"]
+os.environ['KAGGLE_KEY']      = sl.secrets["KAGGLE_KEY"]
 
 api = KaggleApi()
-api.authenticate(un, key)
+api.authenticate()
 
 c = CurrencyRates()
 
