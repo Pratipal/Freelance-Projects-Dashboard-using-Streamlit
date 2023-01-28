@@ -32,6 +32,7 @@ country_dict['Serbia']                    = 'SRB'
 country_dict['Taiwan, Province of China'] = 'TWN'
 country_dict['Moldova, Republic of']      = 'MDA'
 country_dict['North Macedonia']           = 'MKD'
+country_dict['Hong Kong']                 = 'HKG'
 
 
 # Adding some new columns to the dataframe as well and converting types of the columns accordingly
@@ -195,6 +196,8 @@ xdf.columns = cols
 # sl.dataframe(xdf)
 sl.markdown(hide_table_row_index, unsafe_allow_html=True)
 sl.table(xdf)
+
+sl.write('Note: Hourly projects are excluded for the Hightest and Lowest budget.')
 
 # # Creating 6 new columns to show the KPIs
 # first_column, second_column, third_column, fourth_column, fifth_column, sixth_column = sl.columns(6, gap = 'large')
