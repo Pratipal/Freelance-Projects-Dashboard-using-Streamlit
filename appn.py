@@ -5,8 +5,7 @@ from streamlit_extras.chart_container import chart_container
 import plotly.express as px
 import os
 from kaggle.api.kaggle_api_extended import KaggleApi
-from forex_python.converter import CurrencyRates
-
+from forex_python.converter import CurrencyRates, RatesNotAvailableError
 
 def get_projects(api):
     api.dataset_download_files("prtpljdj/freeelance-platform-projects", unzip=True)
@@ -126,8 +125,14 @@ df['Date'] = df['Date Posted'].dt.date
 
 
 # Getting the exchange rates of GBP to USD and EUR to USD by the starting date
-gbp_to_usd_rate = c.get_rate('GBP', 'USD', start_date)
-eur_to_usd_rate = c.get_rate('EUR', 'USD', start_date)
+
+try:
+    gbp_to_usd_rate = c.get_rate('GBP', 'USD', start_date)
+    eur_to_usd_rate = c.get_rate('EUR', 'USD', start_date)
+except RatesNotAvailableError as e:
+    print('Exchange rates not available using the old exchange rates')
+    gbp_to_usd_rate = 1.21
+    eur_to_usd_rate = 1.08
 
 
 # Converting the budget column values to USD
@@ -150,22 +155,15 @@ emojis = ['', ':first_place_medal:', ':second_place_medal:', ':third_place_medal
 
 
 # Extracting the values of KPI's
-top_3_categories = df_selection['Category Name'].value_counts().index[0:3]
-top_3_sub_categories = df_selection['Sub Category Name'].value_counts().index[0:3]
+top_3_categories       = df_selection['Category Name'].value_counts().index[0:3]
+top_3_sub_categories   = df_selection['Sub Category Name'].value_counts().index[0:3]
 top_3_client_countries = df_selection['Client Country'].value_counts().index[0:3]
-
-
-# # Extracting the values of KPI's
-# top_3_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' + x[1] for x in enumerate(df_selection['Category Name'].value_counts().index[0:3], start = 1)])
-# top_3_sub_categories = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Sub Category Name'].value_counts().index[0:3], start = 1)])
-# top_3_client_countries = '\n'.join([str(x[0])+') '+ emojis[x[0]] + ' ' +x[1] for x in enumerate(df_selection['Client Country'].value_counts().index[0:3], start = 1)])
-
 
 # Sorting the filtered dataframe by Budget in descending order
 sorted_df = df_selection.sort_values(['Budget_USD'], ascending=False)
 
-most_expensive_budget = round(sorted_df[sorted_df['Type']=='fixed_price']['Budget_USD'].values[0], 2)
-most_expensive_category = sorted_df[sorted_df['Type']=='fixed_price']['Category Name'].values[0]
+most_expensive_budget      = round(sorted_df[sorted_df['Type']=='fixed_price']['Budget_USD'].values[0], 2)
+most_expensive_category    = sorted_df[sorted_df['Type']=='fixed_price']['Category Name'].values[0]
 most_expensive_subcategory = sorted_df[sorted_df['Type']=='fixed_price']['Sub Category Name'].values[0]
 
 mep_data = [f'Budget - ${most_expensive_budget:,}',
@@ -177,8 +175,8 @@ mep_df = pd.DataFrame([['Budget', 'Category', 'Sub Category'],
                         [f'${most_expensive_budget:,}', most_expensive_category, most_expensive_subcategory]]).T
 
 
-least_expensive_budget = round(sorted_df[sorted_df['Type']=='fixed_price']['Budget_USD'].values[-1], 2)
-least_expensive_category = sorted_df[sorted_df['Type']=='fixed_price']['Category Name'].values[-1]
+least_expensive_budget      = round(sorted_df[sorted_df['Type']=='fixed_price']['Budget_USD'].values[-1], 2)
+least_expensive_category    = sorted_df[sorted_df['Type']=='fixed_price']['Category Name'].values[-1]
 least_expensive_subcategory = sorted_df[sorted_df['Type']=='fixed_price']['Sub Category Name'].values[-1]
 
 
@@ -255,7 +253,7 @@ hour_df = df.groupby(['Hour', 'Category Name']).size().reset_index(name = 'Count
 
 with chart_container(hour_df):
     # Setting header and adding some notes
-    sl.header('Number of projects by hour of the day and category')
+    sl.header('Number of projects by hour of the day and category - Greenwich Mean Time (GMT)')
     sl.text('(Independent of Date Selection as there is not much data at the moment.)')
 
     # Creating a plotly bar chart
